@@ -106,14 +106,14 @@
             "whatwg-url": "^14.0.0"
         }
     },
-    "name": "sillytavern",
+    "name": "sillytavern-chloe",
     "type": "module",
     "license": "AGPL-3.0",
     "repository": {
         "type": "git",
-        "url": "https://github.com/SillyTavern/SillyTavern.git"
+        "url": "https://github.com/2830897438/SillyTavern-Chloe.git"
     },
-    "version": "1.13.5",
+    "version": "1.0.0",
     "scripts": {
         "start": "node server.js",
         "debug": "node --inspect server.js",
