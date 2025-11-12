@@ -919,23 +919,8 @@ export function requireLoginMiddleware(request, response, next) {
  * @param {import('express').Response} response Response object
  */
 export async function loginPageMiddleware(request, response) {
-    if (!ENABLE_ACCOUNTS) {
-        console.log('User accounts are disabled. Redirecting to index page.');
-        return response.redirect('/');
-    }
-
-    try {
-        const { basicAuthMode } = globalThis.COMMAND_LINE_ARGS;
-        const autoLogin = await tryAutoLogin(request, basicAuthMode);
-
-        if (autoLogin) {
-            return response.redirect('/');
-        }
-    } catch (error) {
-        console.error('Error during auto-login:', error);
-    }
-
-    return response.sendFile('login.html', { root: path.join(serverDirectory, 'public') });
+    // 禁用原项目的登录页路由，统一跳转到独立的 OAuth 登录页
+    return response.redirect('/oauth.html');
 }
 
 /**

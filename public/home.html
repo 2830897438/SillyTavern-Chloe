@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="robots" content="noindex, nofollow">
+    <title>用户主页 - Chloe</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="android-chrome-512x512.png">
+    <link rel="stylesheet" href="css/st-tailwind.css">
+    <link rel="stylesheet" href="css/home.css">
+    <link href="webfonts/NotoSans/stylesheet.css" rel="stylesheet">
+    <link href="webfonts/NotoSansMono/stylesheet.css" rel="stylesheet">
+    <!-- Pixel Font from Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=DotGothic16&display=swap" rel="stylesheet">
+</head>
+<body class="pixel-bg">
+    <!-- Pixel Grid Background -->
+    <div class="pixel-grid"></div>
+
+    <!-- Animated Particles -->
+    <div id="particles"></div>
+
+    <div id="app" class="app-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-small">
+                    <span class="logo-text">CHLOE</span>
+                </div>
+                <button class="close-sidebar" id="closeSidebar">
+                    <span>✕</span>
+                </button>
+            </div>
+
+            <ul class="nav-menu">
+                <li class="nav-item active" data-page="dashboard">
+                    <span class="nav-icon">◆</span>
+                    <span class="nav-text">仪表盘</span>
+                </li>
+                <li class="nav-item" data-page="checkin">
+                    <span class="nav-icon">+</span>
+                    <span class="nav-text">签到</span>
+                </li>
+                <li class="nav-item" data-page="redeem">
+                    <span class="nav-icon">◈</span>
+                    <span class="nav-text">兑换码</span>
+                </li>
+                <li class="nav-item" data-page="leaderboard">
+                    <span class="nav-icon">★</span>
+                    <span class="nav-text">排行榜</span>
+                </li>
+                <li class="nav-item" data-page="settings">
+                    <span class="nav-icon">⚙</span>
+                    <span class="nav-text">设置</span>
+                </li>
+                <li class="nav-item" data-page="about">
+                    <span class="nav-icon">ℹ</span>
+                    <span class="nav-text">关于</span>
+                </li>
+                <li class="nav-item" data-page="contact">
+                    <span class="nav-icon">✉</span>
+                    <span class="nav-text">联系</span>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <button id="logoutBtn" class="pixel-button small logout-btn">
+                    <span class="button-content">
+                        <span class="button-icon">◄</span>
+                        <span class="button-text">退出登录</span>
+                    </span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Sidebar Overlay -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <button class="menu-toggle" id="menuToggle">
+                    <span class="hamburger">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </span>
+                </button>
+                <h1 class="page-title-top">
+                    <span class="blink-slow">▸</span>
+                    <span id="currentPageTitle">仪表盘</span>
+                </h1>
+                <div class="top-bar-status">
+                    <span class="status-dot blink">●</span>
+                    <span class="status-text">在线</span>
+                </div>
+            </div>
+
+            <!-- Alert Box -->
+            <div id="alert" class="pixel-alert hidden">
+                <div class="alert-icon blink">⚠</div>
+                <div id="alertText" class="alert-text"></div>
+                <button class="alert-close" id="alertClose">✕</button>
+            </div>
+
+            <!-- Page: Dashboard -->
+            <div class="page active" id="page-dashboard">
+                <!-- User Stats Card -->
+                <div class="pixel-card stat-card">
+                    <div class="card-header">
+                        <span class="card-icon">◆</span>
+                        <span class="card-title">用户信息</span>
+                        <div class="scanline"></div>
+                    </div>
+                    <div class="card-body">
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-label">▸ 用户名</div>
+                                <div id="username" class="stat-value glitch-text">-</div>
+                            </div>
+                            <div class="stat-item highlight">
+                                <div class="stat-label">▸ 积分余额</div>
+                                <div id="points" class="stat-value large">-</div>
+                            </div>
+                        </div>
+
+                        <div class="divider-line"></div>
+
+                        <div class="access-status">
+                            <div class="status-row">
+                                <span class="status-label">访问状态</span>
+                                <span id="accessStatusText" class="status-badge">-</span>
+                            </div>
+                            <div class="status-row">
+                                <span class="status-label">关闭天数</span>
+                                <span class="counter-value">
+                                    <span id="offDays" class="blink-slow">0</span>
+                                    <span class="counter-max">/ 30</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="pixel-card action-card">
+                    <div class="card-header">
+                        <span class="card-icon">▶</span>
+                        <span class="card-title">快速操作</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="action-grid">
+                            <a href="/app" id="enterBtn" class="pixel-button primary large">
+                                <span class="button-corners"></span>
+                                <span class="button-content">
+                                    <span class="button-icon">▸▸</span>
+                                    <span class="button-text">进入 SillyTavern</span>
+                                </span>
+                                <span class="button-hover-effect"></span>
+                            </a>
+                            <button class="pixel-button" data-nav="checkin">
+                                <span class="button-content">
+                                    <span class="button-icon">+</span>
+                                    <span class="button-text">前往签到</span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page: Check-in -->
+            <div class="page" id="page-checkin">
+                <div class="pixel-card">
+                    <div class="card-header">
+                        <span class="card-icon">+</span>
+                        <span class="card-title">每日签到</span>
+                        <div class="scanline"></div>
+                    </div>
+                    <div class="card-body">
+                        <div class="checkin-section">
+                            <div class="checkin-info">
+                                <div class="info-box">
+                                    <div class="info-label">当前积分</div>
+                                    <div id="pointsCheckin" class="info-value">-</div>
+                                </div>
+                                <div class="info-box">
+                                    <div class="info-label">签到奖励</div>
+                                    <div class="info-value">+5</div>
+                                </div>
+                            </div>
+
+                            <button id="checkinBtn" class="pixel-button action-btn large">
+                                <span class="button-content">
+                                    <span class="button-icon">✓</span>
+                                    <span class="button-text">每日签到 +5 积分</span>
+                                </span>
+                            </button>
+
+                            <div class="checkin-tips">
+                                <div class="tip-item">
+                                    <span class="tip-icon">▸</span>
+                                    <span>每日可签到一次，获得 5 积分</span>
+                                </div>
+                                <div class="tip-item">
+                                    <span class="tip-icon">▸</span>
+                                    <span>积分用于维持 SillyTavern 访问权限</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page: Redeem Code -->
+            <div class="page" id="page-redeem">
+                <div class="pixel-card">
+                    <div class="card-header">
+                        <span class="card-icon">◈</span>
+                        <span class="card-title">兑换码</span>
+                        <div class="scanline"></div>
+                    </div>
+                    <div class="card-body">
+                        <div class="redeem-section">
+                            <div class="input-group">
+                                <label for="redeemCode" class="input-label">
+                                    <span class="label-icon">▸</span>
+                                    <span>输入兑换码</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    id="redeemCode"
+                                    class="pixel-input"
+                                    placeholder="请输入兑换码"
+                                    maxlength="20"
+                                >
+                            </div>
+
+                            <button id="redeemBtn" class="pixel-button action-btn large">
+                                <span class="button-content">
+                                    <span class="button-icon">◈</span>
+                                    <span class="button-text">立即兑换</span>
+                                </span>
+                            </button>
+
+                            <div id="redeemResult" class="result-message hidden"></div>
+
+                            <div class="redeem-tips">
+                                <div class="tip-title">兑换说明</div>
+                                <div class="tip-item">
+                                    <span class="tip-icon">▸</span>
+                                    <span>兑换码可用于获取额外积分或特殊权限</span>
+                                </div>
+                                <div class="tip-item">
+                                    <span class="tip-icon">▸</span>
+                                    <span>每个兑换码仅可使用一次</span>
+                                </div>
+                                <div class="tip-item">
+                                    <span class="tip-icon">▸</span>
+                                    <span>兑换码不区分大小写</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page: Leaderboard -->
+            <div class="page" id="page-leaderboard">
+                <div class="pixel-card">
+                    <div class="card-header">
+                        <span class="card-icon">★</span>
+                        <span class="card-title">积分排行榜</span>
+                        <div class="scanline"></div>
+                    </div>
+                    <div class="card-body">
+                        <div class="leaderboard-section">
+                            <!-- Leaderboard Stats -->
+                            <div class="leaderboard-stats">
+                                <div class="stat-box">
+                                    <div class="stat-box-label">总用户数</div>
+                                    <div id="totalUsers" class="stat-box-value">-</div>
+                                </div>
+                                <div class="stat-box highlight">
+                                    <div class="stat-box-label">我的排名</div>
+                                    <div id="myRank" class="stat-box-value">-</div>
+                                </div>
+                                <div class="stat-box">
+                                    <div class="stat-box-label">我的积分</div>
+                                    <div id="myPoints" class="stat-box-value">-</div>
+                                </div>
+                            </div>
+
+                            <div class="divider-line"></div>
+
+                            <!-- Leaderboard Table -->
+                            <div class="leaderboard-table-container">
+                                <div class="leaderboard-loading" id="leaderboardLoading">
+                                    <div class="loading-spinner">◆◆◆</div>
+                                    <div class="loading-text">加载中...</div>
+                                </div>
+                                <div class="leaderboard-error hidden" id="leaderboardError">
+                                    <div class="error-icon">✕</div>
+                                    <div class="error-text">加载失败，请稍后再试</div>
+                                </div>
+                                <div class="leaderboard-table hidden" id="leaderboardTable">
+                                    <div class="table-header">
+                                        <div class="table-cell rank-cell">排名</div>
+                                        <div class="table-cell name-cell">用户名</div>
+                                        <div class="table-cell points-cell">积分</div>
+                                    </div>
+                                    <div class="table-body" id="leaderboardBody">
+                                        <!-- Rows will be dynamically inserted here -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Leaderboard Tips -->
+                            <div class="leaderboard-tips">
+                                <div class="tip-item">
+                                    <span class="tip-icon">▸</span>
+                                    <span>排行榜每小时更新一次</span>
+                                </div>
+                                <div class="tip-item">
+                                    <span class="tip-icon">▸</span>
+                                    <span>积分通过每日签到和兑换码获得</span>
+                                </div>
+                                <div class="tip-item">
+                                    <span class="tip-icon">▸</span>
+                                    <span>保持访问开启会持续消耗积分</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page: Settings -->
+            <div class="page" id="page-settings">
+                <div class="pixel-card">
+                    <div class="card-header">
+                        <span class="card-icon">⚙</span>
+                        <span class="card-title">访问设置</span>
+                        <div class="scanline"></div>
+                    </div>
+                    <div class="card-body">
+                        <div class="settings-section">
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <div class="setting-title">SillyTavern 访问</div>
+                                    <div class="setting-desc">控制是否允许访问 SillyTavern</div>
+                                </div>
+                                <div class="access-controls">
+                                    <button id="accessOnBtn" class="pixel-button small access-btn">
+                                        <span class="button-content">
+                                            <span class="button-icon">✓</span>
+                                            <span class="button-text">开启</span>
+                                        </span>
+                                    </button>
+                                    <button id="accessOffBtn" class="pixel-button small access-btn secondary">
+                                        <span class="button-content">
+                                            <span class="button-icon">✕</span>
+                                            <span class="button-text">关闭</span>
+                                        </span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="setting-status">
+                                <div class="status-row">
+                                    <span class="status-label">当前状态</span>
+                                    <span id="accessLabel" class="status-value">-</span>
+                                </div>
+                                <div class="status-row">
+                                    <span class="status-label">每日消耗</span>
+                                    <span id="dailyCost" class="status-value">-</span>
+                                </div>
+                            </div>
+
+                            <div class="divider-line"></div>
+
+                            <div class="setting-tips">
+                                <div class="tip-title">费用说明</div>
+                                <div class="info-line">
+                                    <span class="info-icon">◉</span>
+                                    <span>开启状态：消耗 1 积分/天</span>
+                                </div>
+                                <div class="info-line">
+                                    <span class="info-icon">◉</span>
+                                    <span>关闭状态：不消耗积分</span>
+                                </div>
+                                <div class="info-line">
+                                    <span class="info-icon">◉</span>
+                                    <span>开启操作：一次性扣除 1 积分（立即扣费）</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pixel-card danger-card">
+                    <div class="card-header">
+                        <span class="card-icon">⚠</span>
+                        <span class="card-title">数据清除警告</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="warning-content">
+                            <p class="warning-text">
+                                当访问开关保持"关闭"状态累计达到 30 天，将清除该账号在 SillyTavern 的本地数据。
+                            </p>
+                            <p class="warning-text">
+                                清除后可继续签到累计积分，再开启访问继续使用。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page: About -->
+            <div class="page" id="page-about">
+                <div class="pixel-card">
+                    <div class="card-header">
+                        <span class="card-icon">ℹ</span>
+                        <span class="card-title">关于平台</span>
+                        <div class="scanline"></div>
+                    </div>
+                    <div class="card-body">
+                        <div class="about-section">
+                            <div class="about-logo">
+                                <div class="logo-box">CHLOE</div>
+                                <div class="logo-subtitle">云酒馆共享平台</div>
+                            </div>
+
+                            <div class="about-info">
+                                <div class="info-item">
+                                    <div class="info-label">平台版本</div>
+                                    <div class="info-content">v1.0.0</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">平台理念</div>
+                                    <div class="info-content">希望大家能更轻松，更愉快的享受 AI 时代</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pixel-card rules-card">
+                    <div class="card-header">
+                        <span class="card-icon">📋</span>
+                        <span class="card-title">规则说明</span>
+                    </div>
+                    <div class="card-body">
+                        <ul class="rules-list">
+                            <li class="rule-item">
+                                <span class="rule-bullet">▸</span>
+                                <span>初始余额为 20 积分。</span>
+                            </li>
+                            <li class="rule-item">
+                                <span class="rule-bullet">▸</span>
+                                <span>每日签到可获得 5 积分（每日一次）。</span>
+                            </li>
+                            <li class="rule-item">
+                                <span class="rule-bullet">▸</span>
+                                <span>积分按"天"为单位在本地午夜进行结算与扣除。</span>
+                            </li>
+                            <li class="rule-item">
+                                <span class="rule-bullet">▸</span>
+                                <span>访问开关开启时，每天消耗 1 积分；关闭时不消耗积分。</span>
+                            </li>
+                            <li class="rule-item">
+                                <span class="rule-bullet">▸</span>
+                                <span>将访问开关从关闭切换为开启时，会一次性扣除 1 积分（作为开启费用）。</span>
+                            </li>
+                            <li class="rule-item">
+                                <span class="rule-bullet">▸</span>
+                                <span>进入 SillyTavern 需满足"访问开关开启且积分 &gt; 0"。</span>
+                            </li>
+                            <li class="rule-item">
+                                <span class="rule-bullet">▸</span>
+                                <span>当访问开关保持"关闭"状态累计达到 30 天，将清除该账号在 SillyTavern 的本地数据。</span>
+                            </li>
+                            <li class="rule-item">
+                                <span class="rule-bullet">▸</span>
+                                <span>清除后可继续签到累计积分，再开启访问继续使用。</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page: Contact -->
+            <div class="page" id="page-contact">
+                <div class="pixel-card">
+                    <div class="card-header">
+                        <span class="card-icon">✉</span>
+                        <span class="card-title">联系我</span>
+                        <div class="scanline"></div>
+                    </div>
+                    <div class="card-body">
+                        <div class="contact-section">
+                            <div class="contact-intro">
+                                <p class="contact-text">欢迎与我交流!</p>
+                                <p class="contact-text">如果您对本项目有任何建议、反馈,或需要我帮忙上传数据,欢迎通过以下方式联系我。</p>
+                            </div>
+
+                            <div class="divider-line"></div>
+
+                            <!-- Discord Card -->
+                            <div class="contact-card">
+                                <div class="contact-card-header">
+                                    <span class="contact-icon">
+                                        <svg width="32" height="32" viewBox="0 0 127.14 96.36" fill="currentColor">
+                                            <path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,46,96.12,53,91.08,65.69,84.69,65.69Z"/>
+                                        </svg>
+                                    </span>
+                                    <span class="contact-title">通过 Discord 联系我</span>
+                                </div>
+                                <p class="contact-desc">您可以通过 Discord 直接与我交流，提出建议、报告问题，或申请数据上传帮助。</p>
+                                <a href="https://discord.gg/t2jeC3fC" target="_blank" rel="noopener noreferrer" class="pixel-button primary large contact-btn">
+                                    <span class="button-content">
+                                        <span class="button-icon">◈</span>
+                                        <span class="button-text">加入 Discord</span>
+                                    </span>
+                                </a>
+                            </div>
+
+                            <div class="divider-line"></div>
+
+                            <!-- Contact Tips -->
+                            <div class="contact-tips">
+                                <div class="tip-title">您可以联系我</div>
+                                <div class="tip-item">
+                                    <span class="tip-icon">▸</span>
+                                    <span>对项目提出功能建议或改进意见</span>
+                                </div>
+                                <div class="tip-item">
+                                    <span class="tip-icon">▸</span>
+                                    <span>报告使用中遇到的问题或 Bug</span>
+                                </div>
+                                <div class="tip-item">
+                                    <span class="tip-icon">▸</span>
+                                    <span>申请我帮忙上传角色卡或其他数据</span>
+                                </div>
+                                <div class="tip-item">
+                                    <span class="tip-icon">▸</span>
+                                    <span>分享使用经验和心得</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="pixel-footer">
+                <div class="footer-line"></div>
+                <p class="footer-text">
+                    <span class="blink-slow">▐</span>
+                    云酒馆共享平台 - CHLOE
+                    <span class="blink-slow">▌</span>
+                </p>
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Motion One (UMD) for animations -->
+    <script src="https://cdn.jsdelivr.net/npm/motion@10.16.4/dist/motion.umd.js"></script>
+    <script type="module" src="/scripts/home.js"></script>
+    <noscript>
+        <div class="noscript-warning">
+            ⚠ 需要启用 JavaScript ⚠
+        </div>
+    </noscript>
+</body>
+</html>

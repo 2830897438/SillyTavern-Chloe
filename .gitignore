@@ -39,6 +39,7 @@ secrets.json
 public/movingUI/
 public/QuickReplies/
 content.log
+server.log
 cloudflared.exe
 public/assets/
 access.log

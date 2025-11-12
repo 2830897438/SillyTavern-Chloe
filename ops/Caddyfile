@@ -1,0 +1,22 @@
+# Caddyfile for 云酒馆共享平台 - Chloe
+
+{
+    # Optional: change to your email for ACME notifications
+    # email you@example.com
+}
+
+sillytavern.ve-rel.com {
+    encode zstd gzip
+
+    reverse_proxy 127.0.0.1:8000 {
+        header_up Host {host}
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+    }
+
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+    }
+}
+

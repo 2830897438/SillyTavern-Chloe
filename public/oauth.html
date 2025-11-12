@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <base href="/">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="robots" content="noindex, nofollow">
+    <title>云酒馆共享平台 - Chloe</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="android-chrome-512x512.png">
+    <link rel="stylesheet" href="css/st-tailwind.css">
+    <link rel="stylesheet" href="css/oauth.css">
+    <link href="webfonts/NotoSans/stylesheet.css" rel="stylesheet">
+    <link href="webfonts/NotoSansMono/stylesheet.css" rel="stylesheet">
+    <!-- Pixel Font from Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=DotGothic16&display=swap" rel="stylesheet">
+</head>
+<body class="pixel-bg">
+    <!-- Pixel Grid Background -->
+    <div class="pixel-grid"></div>
+
+    <!-- Animated Particles -->
+    <div id="particles"></div>
+
+    <div id="app" class="app-container">
+        <!-- Glitch Effect Container -->
+        <div class="glitch-container">
+            <!-- Main Card -->
+            <div class="pixel-card">
+                <!-- Logo Section -->
+                <div class="logo-container">
+                    <div class="pixel-border-box">
+                        <img id="logo" src="img/chloe-logo.jpg" alt="Chloe" class="pixel-logo" onerror="this.onerror=null;this.src='https://youke1.picui.cn/s1/2025/11/12/6913ee77e6f20.jpg'" />
+                    </div>
+                    <div class="scanline"></div>
+                </div>
+
+                <!-- Title Section -->
+                <div class="title-section">
+                    <h1 class="pixel-title" data-text="云酒馆共享平台">
+                        <span class="glitch-text">云酒馆共享平台</span>
+                    </h1>
+                    <div class="subtitle-container">
+                        <span class="pixel-badge">CHLOE</span>
+                        <span class="pixel-divider">█</span>
+                        <span class="status-indicator">
+                            <span class="blink">●</span> 在线
+                        </span>
+                    </div>
+                    <p class="pixel-description">
+                        ▸ 希望大家能更轻松，更愉快的享受ai时代
+                    </p>
+                </div>
+
+                <!-- Buttons Section -->
+                <div class="buttons-section">
+                    <a href="/auth/linuxdo" class="pixel-button" id="btn-linuxdo" data-platform="linuxdo">
+                        <span class="button-corners"></span>
+                        <span class="button-content">
+                            <span class="button-icon">▸</span>
+                            <span class="button-text">使用 LinuxDo 登录</span>
+                        </span>
+                        <span class="button-hover-effect"></span>
+                    </a>
+
+                    <a href="/auth/discord" class="pixel-button" id="btn-discord" data-platform="discord">
+                        <span class="button-corners"></span>
+                        <span class="button-content">
+                            <span class="button-icon">▸</span>
+                            <span class="button-text">使用 Discord 登录</span>
+                        </span>
+                        <span class="button-hover-effect"></span>
+                    </a>
+                </div>
+
+                <!-- Footer -->
+                <div class="pixel-footer">
+                    <div class="footer-line"></div>
+                    <p class="footer-text">
+                        <span class="blink-slow">▐</span>
+                        继续即表示同意使用条款
+                        <span class="blink-slow">▌</span>
+                    </p>
+                    <div class="footer-stats">
+                        <span id="visitor-count">访客数: <span class="count-number">███</span></span>
+                        <span class="pixel-divider">│</span>
+                        <span id="system-status">状态: <span class="status-ok">正常</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Decorative Elements -->
+            <div class="corner-decoration top-left">┏</div>
+            <div class="corner-decoration top-right">┓</div>
+            <div class="corner-decoration bottom-left">┗</div>
+            <div class="corner-decoration bottom-right">┛</div>
+        </div>
+    </div>
+
+    <!-- Motion One (UMD) for subtle animations -->
+    <script src="https://cdn.jsdelivr.net/npm/motion@10.16.4/dist/motion.umd.js"></script>
+    <script src="scripts/oauth-login.js" type="module"></script>
+    <noscript>
+        <div class="noscript-warning">
+            ⚠ 需要启用 JavaScript ⚠
+        </div>
+    </noscript>
+</body>
+</html>

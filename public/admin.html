@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="robots" content="noindex, nofollow">
+    <title>管理后台 - Chloe</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="android-chrome-512x512.png">
+    <link rel="stylesheet" href="css/st-tailwind.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link href="webfonts/NotoSans/stylesheet.css" rel="stylesheet">
+    <link href="webfonts/NotoSansMono/stylesheet.css" rel="stylesheet">
+    <!-- Pixel Font from Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=DotGothic16&display=swap" rel="stylesheet">
+</head>
+<body class="pixel-bg">
+    <!-- Pixel Grid Background -->
+    <div class="pixel-grid"></div>
+
+    <!-- Animated Particles -->
+    <div id="particles"></div>
+
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-container">
+            <div class="pixel-card">
+                <div class="card-header">
+                    <span class="card-icon">⚙</span>
+                    <span class="card-title">管理员登录</span>
+                    <div class="scanline"></div>
+                </div>
+                <div class="card-body">
+                    <div class="login-form">
+                        <div class="input-group">
+                            <label for="adminUsername" class="input-label">
+                                <span class="label-icon">▸</span>
+                                <span>用户名</span>
+                            </label>
+                            <input
+                                type="text"
+                                id="adminUsername"
+                                class="pixel-input"
+                                placeholder="请输入管理员用户名"
+                                autocomplete="username"
+                            >
+                        </div>
+                        <div class="input-group">
+                            <label for="adminPassword" class="input-label">
+                                <span class="label-icon">▸</span>
+                                <span>密码</span>
+                            </label>
+                            <input
+                                type="password"
+                                id="adminPassword"
+                                class="pixel-input"
+                                placeholder="请输入密码"
+                                autocomplete="current-password"
+                            >
+                        </div>
+                        <div id="loginError" class="error-message hidden"></div>
+                        <button id="loginBtn" class="pixel-button action-btn large">
+                            <span class="button-content">
+                                <span class="button-icon">▸</span>
+                                <span class="button-text">登录</span>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="app" class="app-container hidden">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-small">
+                    <span class="logo-text">ADMIN</span>
+                </div>
+                <button class="close-sidebar" id="closeSidebar">
+                    <span>✕</span>
+                </button>
+            </div>
+
+            <ul class="nav-menu">
+                <li class="nav-item active" data-page="dashboard">
+                    <span class="nav-icon">◆</span>
+                    <span class="nav-text">总览</span>
+                </li>
+                <li class="nav-item" data-page="users">
+                    <span class="nav-icon">👤</span>
+                    <span class="nav-text">用户管理</span>
+                </li>
+                <li class="nav-item" data-page="redeem">
+                    <span class="nav-icon">◈</span>
+                    <span class="nav-text">兑换码管理</span>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <button id="logoutBtn" class="pixel-button small logout-btn">
+                    <span class="button-content">
+                        <span class="button-icon">◄</span>
+                        <span class="button-text">退出登录</span>
+                    </span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Sidebar Overlay -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <button class="menu-toggle" id="menuToggle">
+                    <span class="hamburger">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </span>
+                </button>
+                <h1 class="page-title-top">
+                    <span class="blink-slow">▸</span>
+                    <span id="currentPageTitle">系统总览</span>
+                </h1>
+                <div class="top-bar-status">
+                    <span class="status-dot blink">●</span>
+                    <span class="status-text">管理员</span>
+                </div>
+            </div>
+
+            <!-- Page: Dashboard -->
+            <div class="page active" id="page-dashboard">
+                <!-- System Stats Card -->
+                <div class="pixel-card stat-card">
+                    <div class="card-header">
+                        <span class="card-icon">◆</span>
+                        <span class="card-title">系统统计</span>
+                        <div class="scanline"></div>
+                    </div>
+                    <div class="card-body">
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-label">▸ 总用户数</div>
+                                <div id="totalUsers" class="stat-value">-</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">▸ 活跃用户</div>
+                                <div id="activeUsers" class="stat-value">-</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">▸ 总存储</div>
+                                <div id="totalStorage" class="stat-value">-</div>
+                            </div>
+                            <div class="stat-item highlight">
+                                <div class="stat-label">▸ 总积分</div>
+                                <div id="totalPoints" class="stat-value large">-</div>
+                            </div>
+                        </div>
+
+                        <div class="divider-line"></div>
+
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-label">▸ 兑换码总数</div>
+                                <div id="totalCodes" class="stat-value">-</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">▸ 已使用</div>
+                                <div id="usedCodes" class="stat-value">-</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">▸ 未使用</div>
+                                <div id="unusedCodes" class="stat-value">-</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Settings Card -->
+                <div class="pixel-card">
+                    <div class="card-header">
+                        <span class="card-icon">⚙</span>
+                        <span class="card-title">系统设置</span>
+                        <div class="scanline"></div>
+                    </div>
+                    <div class="card-body">
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">
+                                    <span class="label-icon">▸</span>
+                                    <span>新用户注册</span>
+                                </div>
+                                <div class="setting-description">允许新用户通过OAuth注册账号</div>
+                            </div>
+                            <div class="setting-control">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="registrationToggle">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page: Users -->
+            <div class="page" id="page-users">
+                <div class="pixel-card">
+                    <div class="card-header">
+                        <span class="card-icon">👤</span>
+                        <span class="card-title">用户管理</span>
+                        <div class="scanline"></div>
+                    </div>
+                    <div class="card-body">
+                        <div class="users-table-container">
+                            <div class="loading-state" id="usersLoading">
+                                <div class="loading-spinner">◆◆◆</div>
+                                <div class="loading-text">加载中...</div>
+                            </div>
+                            <div class="users-table hidden" id="usersTable">
+                                <div class="table-header">
+                                    <div class="table-cell">用户名</div>
+                                    <div class="table-cell">积分</div>
+                                    <div class="table-cell">访问</div>
+                                    <div class="table-cell">存储</div>
+                                    <div class="table-cell">状态</div>
+                                    <div class="table-cell">操作</div>
+                                </div>
+                                <div class="table-body" id="usersTableBody">
+                                    <!-- User rows will be inserted here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page: Redeem Codes -->
+            <div class="page" id="page-redeem">
+                <!-- Create Codes Card -->
+                <div class="pixel-card">
+                    <div class="card-header">
+                        <span class="card-icon">+</span>
+                        <span class="card-title">创建兑换码</span>
+                        <div class="scanline"></div>
+                    </div>
+                    <div class="card-body">
+                        <div class="create-redeem-section">
+                            <div class="input-grid">
+                                <div class="input-group">
+                                    <label for="redeemPoints" class="input-label">
+                                        <span class="label-icon">▸</span>
+                                        <span>积分数量</span>
+                                    </label>
+                                    <input
+                                        type="number"
+                                        id="redeemPoints"
+                                        class="pixel-input"
+                                        placeholder="请输入积分数量"
+                                        min="1"
+                                        value="10"
+                                    >
+                                </div>
+                                <div class="input-group">
+                                    <label for="redeemCount" class="input-label">
+                                        <span class="label-icon">▸</span>
+                                        <span>生成数量</span>
+                                    </label>
+                                    <input
+                                        type="number"
+                                        id="redeemCount"
+                                        class="pixel-input"
+                                        placeholder="生成数量(1-100)"
+                                        min="1"
+                                        max="100"
+                                        value="1"
+                                    >
+                                </div>
+                            </div>
+                            <button id="createRedeemBtn" class="pixel-button action-btn large">
+                                <span class="button-content">
+                                    <span class="button-icon">+</span>
+                                    <span class="button-text">批量创建兑换码</span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Redeem Codes List -->
+                <div class="pixel-card">
+                    <div class="card-header">
+                        <span class="card-icon">◈</span>
+                        <span class="card-title">兑换码列表</span>
+                        <div class="scanline"></div>
+                    </div>
+                    <div class="card-body">
+                        <div class="codes-table-container">
+                            <div class="loading-state" id="codesLoading">
+                                <div class="loading-spinner">◆◆◆</div>
+                                <div class="loading-text">加载中...</div>
+                            </div>
+                            <div class="codes-table hidden" id="codesTable">
+                                <div class="table-header">
+                                    <div class="table-cell">兑换码</div>
+                                    <div class="table-cell">积分</div>
+                                    <div class="table-cell">状态</div>
+                                    <div class="table-cell">使用者</div>
+                                    <div class="table-cell">创建时间</div>
+                                    <div class="table-cell">操作</div>
+                                </div>
+                                <div class="table-body" id="codesTableBody">
+                                    <!-- Code rows will be inserted here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="pixel-footer">
+                <div class="footer-line"></div>
+                <p class="footer-text">
+                    <span class="blink-slow">▐</span>
+                    云酒馆管理后台 - CHLOE ADMIN
+                    <span class="blink-slow">▌</span>
+                </p>
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Confirmation Dialog -->
+    <div id="confirmDialog" class="dialog-overlay hidden">
+        <div class="pixel-dialog">
+            <div class="dialog-header">
+                <span class="dialog-icon">⚠</span>
+                <span class="dialog-title" id="dialogTitle">确认操作</span>
+            </div>
+            <div class="dialog-body">
+                <p class="dialog-message" id="dialogMessage"></p>
+            </div>
+            <div class="dialog-footer">
+                <button id="dialogConfirm" class="pixel-button dialog-btn confirm-btn">
+                    <span class="button-content">
+                        <span class="button-text">确认</span>
+                    </span>
+                </button>
+                <button id="dialogCancel" class="pixel-button dialog-btn cancel-btn">
+                    <span class="button-content">
+                        <span class="button-text">取消</span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Points Edit Dialog -->
+    <div id="pointsDialog" class="dialog-overlay hidden">
+        <div class="pixel-dialog">
+            <div class="dialog-header">
+                <span class="dialog-icon">◆</span>
+                <span class="dialog-title">修改积分</span>
+            </div>
+            <div class="dialog-body">
+                <div class="input-group">
+                    <label for="pointsAction" class="input-label">
+                        <span class="label-icon">▸</span>
+                        <span>操作类型</span>
+                    </label>
+                    <select id="pointsAction" class="pixel-input">
+                        <option value="add">增加</option>
+                        <option value="subtract">减少</option>
+                        <option value="set">设置为</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="pointsAmount" class="input-label">
+                        <span class="label-icon">▸</span>
+                        <span>积分数量</span>
+                    </label>
+                    <input
+                        type="number"
+                        id="pointsAmount"
+                        class="pixel-input"
+                        placeholder="请输入积分数量"
+                        min="0"
+                        value="10"
+                    >
+                </div>
+            </div>
+            <div class="dialog-footer">
+                <button id="pointsConfirm" class="pixel-button dialog-btn confirm-btn">
+                    <span class="button-content">
+                        <span class="button-text">确认</span>
+                    </span>
+                </button>
+                <button id="pointsCancel" class="pixel-button dialog-btn cancel-btn">
+                    <span class="button-content">
+                        <span class="button-text">取消</span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Motion One (UMD) for animations -->
+    <script src="https://cdn.jsdelivr.net/npm/motion@10.16.4/dist/motion.umd.js"></script>
+    <script type="module" src="/scripts/admin.js"></script>
+    <noscript>
+        <div class="noscript-warning">
+            ⚠ 需要启用 JavaScript ⚠
+        </div>
+    </noscript>
+</body>
+</html>

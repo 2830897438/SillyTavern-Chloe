@@ -79,7 +79,7 @@ requestProxy:
     - localhost
     - 127.0.0.1
 # Enable multi-user mode
-enableUserAccounts: false
+enableUserAccounts: true
 # Enable discreet login mode: hides user list on the login screen
 enableDiscreetLogin: false
 # If `basicAuthMode` and this are enabled then
@@ -105,6 +105,23 @@ sso:
   # as that used for authentik. (Ensure the username in authentik
   # is an exact match in lowercase with that in sillytavern).
   authentikAuth: false
+
+# -- OAUTH CONFIGURATION --
+oauth:
+  # Public callback URL. Set to your domain in production.
+  redirectUri: 'https://sillytavern.ve-rel.com/oauth'
+  # Discord OAuth settings (leave secrets empty here; prefer environment variables)
+  discord:
+    clientId: ''
+    clientSecret: ''
+  # LinuxDo OAuth settings (requires provider endpoints)
+  linuxdo:
+    clientId: ''
+    clientSecret: ''
+    authorizeUrl: 'https://connect.linux.do/oauth2/authorize'
+    tokenUrl: 'https://connect.linux.do/oauth2/token'
+    userInfoUrl: 'https://connect.linux.do/api/user'
+    scope: 'openid profile email'
 
 # Host whitelist configuration. Recommended if you're using a listen mode
 hostWhitelist:

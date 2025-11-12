@@ -12,6 +12,7 @@ import compression from 'compression';
 import cookieSession from 'cookie-session';
 import multer from 'multer';
 import responseTime from 'response-time';
+import { router as oauthRouter } from './oauth.js';
 import helmet from 'helmet';
 import bodyParser from 'body-parser';
 
@@ -59,9 +60,11 @@ import {
 } from './util.js';
 import { UPLOADS_DIRECTORY } from './constants.js';
 import { ensureThumbnailCache } from './endpoints/thumbnails.js';
+import { getEffectiveAccess } from './endpoints/account.js';
 
 // Routers
 import { router as usersPublicRouter } from './endpoints/users-public.js';
+import { router as adminRouter } from './endpoints/admin.js';
 import { init as statsInit, onExit as statsOnExit } from './endpoints/stats.js';
 import { checkForNewContent } from './endpoints/content-manager.js';
 import { init as settingsInit } from './endpoints/settings.js';
@@ -96,6 +99,8 @@ app.use(helmet({
 }));
 app.use(compression());
 app.use(responseTime());
+// Behind reverse proxy (HTTPS offloaded). Trust proxy for correct req.ip/req.secure.
+app.set('trust proxy', true);
 
 app.use(bodyParser.json({ limit: '500mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '500mb' }));
@@ -133,12 +138,15 @@ if (cliArgs.enableCorsProxy) {
     });
 }
 
+const oauthRedirect = String(getConfigValue('oauth.redirectUri', ''));
+const useSecureCookies = oauthRedirect.startsWith('https://');
 app.use(cookieSession({
     name: getCookieSessionName(),
     sameSite: 'lax',
     httpOnly: true,
     maxAge: getSessionCookieAge(),
     secret: getCookieSecret(globalThis.DATA_ROOT),
+    secure: useSecureCookies,
 }));
 
 app.use(setUserDataMiddleware);
@@ -191,12 +199,33 @@ if (!cliArgs.disableCsrf) {
 app.get('/', cacheBuster.middleware, (request, response) => {
     if (shouldRedirectToLogin(request)) {
         const query = request.url.split('?')[1];
-        const redirectUrl = query ? `/login?${query}` : '/login';
+        const redirectUrl = query ? `/oauth.html?${query}` : '/oauth.html';
         return response.redirect(redirectUrl);
     }
 
-    return response.sendFile('index.html', { root: path.join(serverDirectory, 'public') });
+    return response.sendFile('home.html', { root: path.join(serverDirectory, 'public') });
 });
+
+// SillyTavern app entry (gated by account points)
+app.get('/app', requireLoginMiddleware, async (request, response) => {
+    try {
+        const access = await getEffectiveAccess(request);
+        if (!access.allowed) {
+            const reason = access.reason || 'DENIED';
+            const url = new URL(request.protocol + '://' + request.get('host'));
+            url.pathname = '/';
+            url.searchParams.set('denied', reason);
+            return response.redirect(url.toString());
+        }
+        return response.sendFile('index.html', { root: path.join(serverDirectory, 'public') });
+    } catch (err) {
+        console.error('Failed to verify access for /app', err);
+        return response.sendStatus(500);
+    }
+});
+
+// OAuth routes (public)
+app.use(oauthRouter);
 
 // Callback endpoint for OAuth PKCE flows (e.g. OpenRouter)
 app.get('/callback/:source?', (request, response) => {
@@ -215,10 +244,19 @@ app.get('/login', loginPageMiddleware);
 // Host frontend assets
 const webpackMiddleware = getWebpackServeMiddleware();
 app.use(webpackMiddleware);
+app.get('/index.html', (req, res) => res.redirect('/app'));
 app.use(express.static(path.join(serverDirectory, 'public'), {}));
 
 // Public API
 app.use('/api/users', usersPublicRouter);
+
+// Admin API (has its own authentication)
+app.use('/api/admin', adminRouter);
+
+// Admin page
+app.get('/admin', (req, res) => {
+    return res.sendFile('admin.html', { root: path.join(serverDirectory, 'public') });
+});
 
 // Everything below this line requires authentication
 app.use(requireLoginMiddleware);
