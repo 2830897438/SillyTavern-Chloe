@@ -307,19 +307,38 @@ router.get('/oauth', async (req, res) => {
             const me = await meResp.json();
             const discordId = String(me.id || '').trim();
             const baseHandle = sanitizeHandle(`discord-${discordId || crypto.randomBytes(2).toString('hex')}`);
-            await ensureUser(baseHandle, me.global_name || me.username || 'Discord 用户', inviteCode);
+            const displayName = me.global_name || me.username || 'Discord 用户';
 
-            if (req.session) {
-                req.session.handle = baseHandle;
-                req.session.touch = Date.now();
-                // clear one-time oauth fields
-                req.session.oauthState = null;
-                req.session.oauthProvider = null;
-                req.session.oauthInviteCode = null;
+            try {
+                await ensureUser(baseHandle, displayName, inviteCode);
+
+                if (req.session) {
+                    req.session.handle = baseHandle;
+                    req.session.touch = Date.now();
+                    // clear one-time oauth fields
+                    req.session.oauthState = null;
+                    req.session.oauthProvider = null;
+                    req.session.oauthInviteCode = null;
+                }
+                await retireDefaultAdmin();
+                await disableSecurityOverrideInConfig();
+                return res.redirect('/');
+            } catch (err) {
+                if (err.message === 'REGISTRATION_DISABLED') {
+                    // 保存OAuth用户信息到session，等待邀请码
+                    if (req.session) {
+                        req.session.pendingOAuth = {
+                            provider: 'discord',
+                            handle: baseHandle,
+                            name: displayName,
+                            timestamp: Date.now(),
+                        };
+                    }
+                    // 重定向到oauth页面，带上需要邀请码的标记
+                    return res.redirect('/oauth.html?needInvite=true');
+                }
+                throw err;
             }
-            await retireDefaultAdmin();
-            await disableSecurityOverrideInConfig();
-            return res.redirect('/');
         }
 
         if (provider === 'linuxdo') {
@@ -357,29 +376,91 @@ router.get('/oauth', async (req, res) => {
                 return res.status(500).send('User info fetch failed');
             }
             const me = await meResp.json();
-            const possibleName = me.username || me.name || me.preferred_username || 'LinuxDo 用户';
+            const displayName = me.username || me.name || me.preferred_username || 'LinuxDo 用户';
             const possibleId = String(me.id || me.sub || '').trim();
             const baseHandle = sanitizeHandle(`linuxdo-${possibleId || crypto.randomBytes(2).toString('hex')}`);
-            await ensureUser(baseHandle, possibleName, inviteCode);
 
-            if (req.session) {
-                req.session.handle = baseHandle;
-                req.session.touch = Date.now();
-                req.session.oauthState = null;
-                req.session.oauthProvider = null;
-                req.session.oauthInviteCode = null;
+            try {
+                await ensureUser(baseHandle, displayName, inviteCode);
+
+                if (req.session) {
+                    req.session.handle = baseHandle;
+                    req.session.touch = Date.now();
+                    req.session.oauthState = null;
+                    req.session.oauthProvider = null;
+                    req.session.oauthInviteCode = null;
+                }
+                await retireDefaultAdmin();
+                await disableSecurityOverrideInConfig();
+                return res.redirect('/');
+            } catch (err) {
+                if (err.message === 'REGISTRATION_DISABLED') {
+                    // 保存OAuth用户信息到session，等待邀请码
+                    if (req.session) {
+                        req.session.pendingOAuth = {
+                            provider: 'linuxdo',
+                            handle: baseHandle,
+                            name: displayName,
+                            timestamp: Date.now(),
+                        };
+                    }
+                    // 重定向到oauth页面，带上需要邀请码的标记
+                    return res.redirect('/oauth.html?needInvite=true');
+                }
+                throw err;
             }
-            await retireDefaultAdmin();
-            await disableSecurityOverrideInConfig();
-            return res.redirect('/');
         }
 
         return res.status(400).send('Unknown OAuth provider');
     } catch (err) {
         console.error('OAuth callback failed', err);
-        if (err.message === 'REGISTRATION_DISABLED') {
-            return res.status(403).send('<!DOCTYPE html><html><head><meta charset="utf-8"><title>注册已关闭</title><style>body{font-family:sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;background:#f5f5f5}div{background:white;padding:40px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,0.1);text-align:center;max-width:400px}h1{color:#d32f2f;margin:0 0 20px}p{color:#666;line-height:1.6;margin:0}</style></head><body><div><h1>⚠️ 注册已关闭</h1><p>抱歉，系统管理员已关闭新用户注册功能。</p><p style="margin-top:20px">如有疑问，请联系管理员。</p></div></body></html>');
-        }
         return res.sendStatus(500);
+    }
+});
+
+// 完成带邀请码的OAuth注册
+router.post('/auth/complete-oauth', async (req, res) => {
+    try {
+        const { inviteCode } = req.body || {};
+        const pendingOAuth = req.session?.pendingOAuth;
+
+        if (!pendingOAuth) {
+            return res.status(400).json({ error: '没有待处理的OAuth注册' });
+        }
+
+        // 检查session是否过期（10分钟）
+        const now = Date.now();
+        if (now - pendingOAuth.timestamp > 10 * 60 * 1000) {
+            delete req.session.pendingOAuth;
+            return res.status(400).json({ error: 'OAuth会话已过期，请重新登录' });
+        }
+
+        if (!inviteCode || typeof inviteCode !== 'string') {
+            return res.status(400).json({ error: '请输入邀请码' });
+        }
+
+        // 验证邀请码
+        const isValid = await validateInviteCode(inviteCode);
+        if (!isValid) {
+            return res.status(400).json({ error: '邀请码无效或已过期' });
+        }
+
+        // 完成用户注册
+        await ensureUser(pendingOAuth.handle, pendingOAuth.name, inviteCode);
+
+        // 设置session
+        if (req.session) {
+            req.session.handle = pendingOAuth.handle;
+            req.session.touch = Date.now();
+            delete req.session.pendingOAuth;
+        }
+
+        await retireDefaultAdmin();
+        await disableSecurityOverrideInConfig();
+
+        return res.json({ success: true, message: '注册成功' });
+    } catch (err) {
+        console.error('Complete OAuth with invite code failed', err);
+        return res.status(500).json({ error: '注册失败，请稍后重试' });
     }
 });

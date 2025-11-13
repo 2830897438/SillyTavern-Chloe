@@ -58,20 +58,6 @@
 
                 <!-- Buttons Section -->
                 <div class="buttons-section">
-                    <!-- Optional Invite Code Input -->
-                    <div class="invite-code-section">
-                        <div class="invite-toggle">
-                            <label class="invite-checkbox">
-                                <input type="checkbox" id="hasInviteCode">
-                                <span class="checkbox-label">我有邀请码</span>
-                            </label>
-                        </div>
-                        <div class="invite-input-container hidden" id="inviteInputContainer">
-                            <input type="text" id="inviteCodeInput" class="pixel-input-small" placeholder="请输入邀请码">
-                            <div class="invite-hint">使用邀请码可在注册关闭时注册账号</div>
-                        </div>
-                    </div>
-
                     <a href="/auth/linuxdo" class="pixel-button" id="btn-linuxdo" data-platform="linuxdo">
                         <span class="button-corners"></span>
                         <span class="button-content">
@@ -137,6 +123,38 @@
             <div class="corner-decoration top-right">┓</div>
             <div class="corner-decoration bottom-left">┗</div>
             <div class="corner-decoration bottom-right">┛</div>
+        </div>
+    </div>
+
+    <!-- Invite Code Dialog (hidden by default) -->
+    <div id="inviteCodeDialog" class="dialog-overlay hidden">
+        <div class="pixel-dialog">
+            <div class="dialog-header">
+                <span class="dialog-icon">🎟️</span>
+                <span class="dialog-title">需要邀请码</span>
+            </div>
+            <div class="dialog-body">
+                <p class="dialog-message">
+                    系统当前已关闭新用户注册。<br>
+                    如果您有邀请码，请输入以继续注册。
+                </p>
+                <input type="text" id="dialogInviteCodeInput" class="pixel-input" placeholder="请输入邀请码" maxlength="32">
+                <div id="inviteCodeError" class="error-message hidden"></div>
+            </div>
+            <div class="dialog-footer">
+                <button id="inviteCodeConfirm" class="pixel-button primary">
+                    <span class="button-content">
+                        <span class="button-icon">✓</span>
+                        <span class="button-text">确认</span>
+                    </span>
+                </button>
+                <button id="inviteCodeCancel" class="pixel-button">
+                    <span class="button-content">
+                        <span class="button-icon">✗</span>
+                        <span class="button-text">取消</span>
+                    </span>
+                </button>
+            </div>
         </div>
     </div>
 

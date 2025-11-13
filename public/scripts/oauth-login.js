@@ -297,9 +297,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Start animations immediately
     initializeAnimations();
 
-    // Setup invite code handlers and OAuth buttons
-    setupInviteCodeHandlers();
-    setupOAuthButtons();
+    // Setup invite code dialog handlers
+    setupInviteCodeDialogHandlers();
+
+    // Check if need to show invite code dialog
+    checkNeedInviteCode();
 
     // Add special effects with staggered timing
     setTimeout(() => {
@@ -341,103 +343,124 @@ document.addEventListener('visibilitychange', () => {
 });
 
 // ═══════════════════════════════════════════════════════════════
-// INVITE CODE HANDLING
+// INVITE CODE DIALOG HANDLING
 // ═══════════════════════════════════════════════════════════════
 
-function setupInviteCodeHandlers() {
-    const hasInviteCheckbox = document.getElementById('hasInviteCode');
-    const inviteInputContainer = document.getElementById('inviteInputContainer');
-    const inviteCodeInput = document.getElementById('inviteCodeInput');
+function checkNeedInviteCode() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const needInvite = urlParams.get('needInvite');
 
-    if (!hasInviteCheckbox || !inviteInputContainer) return;
-
-    // Toggle invite code input visibility
-    hasInviteCheckbox.addEventListener('change', () => {
-        if (hasInviteCheckbox.checked) {
-            inviteInputContainer.classList.remove('hidden');
-            if (animate) {
-                animate(inviteInputContainer, {
-                    opacity: [0, 1],
-                    y: [-10, 0]
-                }, { duration: 0.3 });
-            }
-            // Focus on input
-            setTimeout(() => inviteCodeInput?.focus(), 100);
-        } else {
-            if (animate) {
-                animate(inviteInputContainer, {
-                    opacity: [1, 0],
-                    y: [0, -10]
-                }, { duration: 0.3 }).finished.then(() => {
-                    inviteInputContainer.classList.add('hidden');
-                });
-            } else {
-                inviteInputContainer.classList.add('hidden');
-            }
-        }
-    });
+    if (needInvite === 'true') {
+        showInviteCodeDialog();
+    }
 }
 
-// OAuth button handlers with invite code support
-function setupOAuthButtons() {
-    const btnLinuxdo = document.getElementById('btn-linuxdo');
-    const btnDiscord = document.getElementById('btn-discord');
-    const btnRegister = document.getElementById('btn-register');
+function showInviteCodeDialog() {
+    const dialog = document.getElementById('inviteCodeDialog');
+    const input = document.getElementById('dialogInviteCodeInput');
+    const errorDiv = document.getElementById('inviteCodeError');
 
-    function getInviteCode() {
-        const hasInviteCheckbox = document.getElementById('hasInviteCode');
-        const inviteCodeInput = document.getElementById('inviteCodeInput');
+    if (!dialog) return;
 
-        if (hasInviteCheckbox?.checked && inviteCodeInput?.value) {
-            return inviteCodeInput.value.trim();
+    // 清空输入和错误
+    if (input) input.value = '';
+    if (errorDiv) {
+        errorDiv.textContent = '';
+        errorDiv.classList.add('hidden');
+    }
+
+    // 显示对话框
+    dialog.classList.remove('hidden');
+
+    // 聚焦输入框
+    setTimeout(() => input?.focus(), 300);
+}
+
+function hideInviteCodeDialog() {
+    const dialog = document.getElementById('inviteCodeDialog');
+    if (dialog) {
+        dialog.classList.add('hidden');
+    }
+}
+
+function showInviteCodeError(message) {
+    const errorDiv = document.getElementById('inviteCodeError');
+    if (errorDiv) {
+        errorDiv.textContent = message;
+        errorDiv.classList.remove('hidden');
+    }
+}
+
+async function getCsrfToken() {
+    try {
+        const res = await fetch('/csrf-token');
+        const data = await res.json();
+        return data.token || '';
+    } catch {
+        return '';
+    }
+}
+
+async function submitInviteCode() {
+    const input = document.getElementById('dialogInviteCodeInput');
+    const confirmBtn = document.getElementById('inviteCodeConfirm');
+    const inviteCode = input?.value?.trim();
+
+    if (!inviteCode) {
+        showInviteCodeError('请输入邀请码');
+        return;
+    }
+
+    // 禁用按钮
+    if (confirmBtn) confirmBtn.disabled = true;
+
+    try {
+        const token = await getCsrfToken();
+        const res = await fetch('/auth/complete-oauth', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                ...(token && token !== 'disabled' ? { 'X-CSRF-Token': token } : {}),
+            },
+            body: JSON.stringify({ inviteCode }),
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+            // 注册成功，跳转到首页
+            window.location.href = '/';
+        } else {
+            showInviteCodeError(data.error || '邀请码验证失败');
+            if (confirmBtn) confirmBtn.disabled = false;
         }
-        return null;
+    } catch (err) {
+        showInviteCodeError('网络错误，请稍后重试');
+        if (confirmBtn) confirmBtn.disabled = false;
+    }
+}
+
+function setupInviteCodeDialogHandlers() {
+    const confirmBtn = document.getElementById('inviteCodeConfirm');
+    const cancelBtn = document.getElementById('inviteCodeCancel');
+    const input = document.getElementById('dialogInviteCodeInput');
+
+    if (confirmBtn) {
+        confirmBtn.addEventListener('click', submitInviteCode);
     }
 
-    function appendInviteCode(url, inviteCode) {
-        if (!inviteCode) return url;
-        const separator = url.includes('?') ? '&' : '?';
-        return `${url}${separator}invite=${encodeURIComponent(inviteCode)}`;
-    }
-
-    if (btnLinuxdo) {
-        btnLinuxdo.addEventListener('click', (e) => {
-            const inviteCode = getInviteCode();
-            if (inviteCode) {
-                e.preventDefault();
-                const originalHref = '/auth/linuxdo';
-                const newHref = appendInviteCode(originalHref, inviteCode);
-                console.log('▸ Initiating LinuxDo OAuth with invite code...');
-                window.location.href = newHref;
-            } else {
-                console.log('▸ Initiating LinuxDo OAuth...');
-            }
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => {
+            hideInviteCodeDialog();
+            // 清除URL参数并刷新页面
+            window.location.href = '/oauth.html';
         });
     }
 
-    if (btnDiscord) {
-        btnDiscord.addEventListener('click', (e) => {
-            const inviteCode = getInviteCode();
-            if (inviteCode) {
-                e.preventDefault();
-                const originalHref = '/auth/discord';
-                const newHref = appendInviteCode(originalHref, inviteCode);
-                console.log('▸ Initiating Discord OAuth with invite code...');
-                window.location.href = newHref;
-            } else {
-                console.log('▸ Initiating Discord OAuth...');
-            }
-        });
-    }
-
-    if (btnRegister) {
-        btnRegister.addEventListener('click', (e) => {
-            const inviteCode = getInviteCode();
-            if (inviteCode) {
-                e.preventDefault();
-                const newHref = `/register.html?invite=${encodeURIComponent(inviteCode)}`;
-                console.log('▸ Navigating to registration with invite code...');
-                window.location.href = newHref;
+    if (input) {
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                submitInviteCode();
             }
         });
     }

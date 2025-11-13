@@ -516,6 +516,113 @@ html {
 }
 
 /* ═══════════════════════════════════════════════════════════════
+   DIALOG OVERLAY
+   ═══════════════════════════════════════════════════════════════ */
+
+.dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    backdrop-filter: blur(4px);
+}
+
+.dialog-overlay.hidden {
+    display: none;
+}
+
+.pixel-dialog {
+    background: var(--pixel-white);
+    border: 4px solid var(--pixel-black);
+    box-shadow: 8px 8px 0 var(--pixel-black);
+    max-width: 480px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.dialog-header {
+    background: var(--pixel-black);
+    color: var(--pixel-white);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 4px solid var(--pixel-black);
+}
+
+.dialog-icon {
+    font-size: 24px;
+    line-height: 1;
+}
+
+.dialog-title {
+    font-family: var(--pixel-font);
+    font-size: 14px;
+    letter-spacing: 1px;
+    flex: 1;
+}
+
+.dialog-body {
+    padding: 24px 20px;
+}
+
+.dialog-message {
+    font-family: var(--pixel-font-alt);
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--pixel-black);
+    margin-bottom: 16px;
+}
+
+.dialog-body .pixel-input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 3px solid var(--pixel-black);
+    font-family: var(--pixel-font-alt);
+    font-size: 13px;
+    color: var(--pixel-black);
+    outline: none;
+    box-shadow: 4px 4px 0 var(--pixel-black);
+    transition: all 0.2s ease;
+    background: var(--pixel-white);
+}
+
+.dialog-body .pixel-input:focus {
+    box-shadow: 6px 6px 0 var(--pixel-black);
+    transform: translate(-1px, -1px);
+}
+
+.dialog-footer {
+    padding: 16px 20px;
+    border-top: 3px solid var(--pixel-light-gray);
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.dialog-footer .pixel-button {
+    padding: 10px 20px;
+    min-width: 100px;
+    justify-content: center;
+}
+
+.dialog-footer .pixel-button.primary {
+    background: var(--pixel-black);
+    color: var(--pixel-white);
+}
+
+.dialog-footer .pixel-button.primary:hover {
+    background: var(--pixel-dark-gray);
+}
+
+/* ═══════════════════════════════════════════════════════════════
    ANIMATIONS
    ═══════════════════════════════════════════════════════════════ */
 
@@ -960,95 +1067,6 @@ html {
 .pixel-button.primary {
     width: 100%;
     margin-top: 8px;
-}
-
-/* Invite code section on OAuth page */
-.invite-code-section {
-    width: 100%;
-    max-width: 420px;
-    margin: 0 auto 24px;
-    padding: 16px;
-    background: rgba(0, 0, 0, 0.03);
-    border: 2px solid var(--pixel-light-gray);
-}
-
-.invite-toggle {
-    margin-bottom: 12px;
-}
-
-.invite-checkbox {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    cursor: pointer;
-    font-family: var(--pixel-font-alt);
-    font-size: 12px;
-    user-select: none;
-}
-
-.invite-checkbox input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
-    border: 2px solid var(--pixel-black);
-    appearance: none;
-    background: var(--pixel-white);
-    position: relative;
-}
-
-.invite-checkbox input[type="checkbox"]:checked::after {
-    content: '✓';
-    position: absolute;
-    top: -2px;
-    left: 2px;
-    font-size: 14px;
-    color: var(--pixel-black);
-}
-
-.checkbox-label {
-    letter-spacing: 0.5px;
-}
-
-.invite-input-container {
-    margin-top: 12px;
-    transition: all 0.3s ease;
-}
-
-.invite-input-container.hidden {
-    display: none;
-}
-
-.pixel-input-small {
-    width: 100%;
-    padding: 10px 12px;
-    background: var(--pixel-white);
-    border: 3px solid var(--pixel-black);
-    font-family: var(--pixel-font-alt);
-    font-size: 12px;
-    color: var(--pixel-black);
-    outline: none;
-    transition: all 0.2s ease;
-    box-shadow: 3px 3px 0 var(--pixel-black);
-    margin-bottom: 8px;
-}
-
-.pixel-input-small:focus {
-    border-color: var(--pixel-black);
-    box-shadow: 5px 5px 0 var(--pixel-black);
-    transform: translate(-1px, -1px);
-}
-
-.pixel-input-small::placeholder {
-    color: var(--pixel-gray);
-    opacity: 0.6;
-}
-
-.invite-hint {
-    font-family: var(--pixel-font-alt);
-    font-size: 10px;
-    color: var(--pixel-dark-gray);
-    opacity: 0.7;
-    line-height: 1.4;
 }
 
 /* Login form styles (same as register) */
