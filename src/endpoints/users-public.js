@@ -173,3 +173,20 @@ router.post('/register', async (request, response) => {
 // 保持找回密码禁用（如需启用，可实现对应流程）
 router.post('/recover-step1', async (_request, response) => response.sendStatus(404));
 router.post('/recover-step2', async (_request, response) => response.sendStatus(404));
+
+// 获取系统统计信息（公开接口）
+router.get('/stats', async (_request, response) => {
+    try {
+        const keys = await storage.keys();
+        const userKeys = keys.filter(key => key.startsWith('user:'));
+        const userCount = userKeys.length;
+
+        return response.json({
+            userCount,
+            timestamp: Date.now(),
+        });
+    } catch (error) {
+        console.error('Get stats error:', error);
+        return response.status(500).json({ error: '获取统计信息失败' });
+    }
+});

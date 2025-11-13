@@ -79,12 +79,23 @@ class PixelParticleSystem {
 // VISITOR COUNTER ANIMATION
 // ═══════════════════════════════════════════════════════════════
 
-function animateVisitorCounter() {
+async function animateVisitorCounter() {
     const counterElement = document.querySelector('.count-number');
     if (!counterElement) return;
 
+    // 获取真实用户数量
+    let targetNumber = 100; // 默认值
+    try {
+        const res = await fetch('/api/users/stats');
+        if (res.ok) {
+            const data = await res.json();
+            targetNumber = data.userCount || 100;
+        }
+    } catch (err) {
+        console.warn('Failed to fetch user count:', err);
+    }
+
     const chars = '█▓▒░0123456789';
-    const targetNumber = Math.floor(Math.random() * 101) + 100; // 100-200
     let frame = 0;
     const maxFrames = 30;
 
@@ -96,7 +107,8 @@ function animateVisitorCounter() {
         }
 
         let scrambled = '';
-        for (let i = 0; i < 3; i++) {
+        const numDigits = targetNumber.toString().length;
+        for (let i = 0; i < numDigits; i++) {
             scrambled += chars[Math.floor(Math.random() * chars.length)];
         }
         counterElement.textContent = scrambled;
